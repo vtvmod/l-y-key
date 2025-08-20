@@ -85,11 +85,14 @@
   const stepsLabel = document.getElementById("stepsLabel");
 
  function getDeviceId() {
-  const ua = navigator.userAgent;
-  const screenRes = window.screen.width + "x" + window.screen.height;
-  const lang = navigator.language;
-  const raw = ua + "|" + screenRes + "|" + lang;
-  return btoa(raw).substring(0, 20); // mã hóa base64 lấy 20 ký tự
+  // Lấy deviceId từ localStorage nếu có
+  let deviceId = localStorage.getItem("deviceId");
+  if (!deviceId) {
+    // Nếu chưa có thì tạo mới và lưu lại
+    deviceId = "DEV_" + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem("deviceId", deviceId);
+  }
+  return deviceId;
 }
 
 async function createFreeKey() {
@@ -107,10 +110,10 @@ async function createFreeKey() {
   const deviceData = await deviceRes.json();
 
   if (deviceData && deviceData.key && deviceData.expires_after > 0) {
-    return deviceData.key; // trả về key cũ nếu đã tồn tại
+    return deviceData.key; // trả về key cũ
   }
 
-  // Tạo key mới
+  // tạo key mới
   const randomPart = Math.random().toString(36).substring(2, 12);
   const fullKey = "FREE_VTVMOD_" + randomPart;
 
@@ -122,16 +125,24 @@ async function createFreeKey() {
     deviceId: deviceId
   };
 
-  // Lưu key vào database valid_keys
+  // Lưu key vào valid_keys
   const url = `https://hqvkey-default-rtdb.firebaseio.com/valid_keys/${fullKey}.json`;
-  await fetch(url, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify(keyBody) });
+  await fetch(url, { 
+    method: "PUT", 
+    headers: {"Content-Type": "application/json"}, 
+    body: JSON.stringify(keyBody) 
+  });
 
   // Lưu map deviceId -> key
   const deviceBody = {
     key: fullKey,
     expires_after: expiresIn
   };
-  await fetch(deviceUrl, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify(deviceBody) });
+  await fetch(deviceUrl, { 
+    method: "PUT", 
+    headers: {"Content-Type": "application/json"}, 
+    body: JSON.stringify(deviceBody) 
+  });
 
   return fullKey;
 }
