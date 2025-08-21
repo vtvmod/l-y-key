@@ -109,11 +109,12 @@ async function createFreeKey() {
   const deviceRes = await fetch(deviceUrl);
   const deviceData = await deviceRes.json();
 
-  if (deviceData && deviceData.key && deviceData.expires_after > 0) {
-    return deviceData.key; // trả về key cũ
+  if (deviceData && deviceData.key) {
+    // 🔑 nếu có key trong Firebase thì trả về key cũ
+    return deviceData.key;
   }
 
-  // tạo key mới
+  // nếu chưa có thì tạo mới
   const randomPart = Math.random().toString(36).substring(2, 12);
   const fullKey = "FREE_VTVMOD_" + randomPart;
 
@@ -125,7 +126,7 @@ async function createFreeKey() {
     deviceId: deviceId
   };
 
-  // Lưu key vào valid_keys
+  // lưu key vào valid_keys
   const url = `https://hqvkey-default-rtdb.firebaseio.com/valid_keys/${fullKey}.json`;
   await fetch(url, { 
     method: "PUT", 
@@ -133,7 +134,7 @@ async function createFreeKey() {
     body: JSON.stringify(keyBody) 
   });
 
-  // Lưu map deviceId -> key
+  // lưu map deviceId -> key
   const deviceBody = {
     key: fullKey,
     expires_after: expiresIn
@@ -146,6 +147,7 @@ async function createFreeKey() {
 
   return fullKey;
 }
+
 
   async function getRedirectMode() {
     try {
