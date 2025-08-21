@@ -84,7 +84,7 @@
   const configUrl = "https://solanvuot-default-rtdb.asia-southeast1.firebasedatabase.app/config/redirect_mode.json";
   const stepsLabel = document.getElementById("stepsLabel");
 
- function getDeviceId() {
+function getDeviceId() {
   // Lấy deviceId từ localStorage nếu có
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
@@ -146,7 +146,6 @@ async function createFreeKey() {
 
   return fullKey;
 }
-
 
   async function getRedirectMode() {
     try {
